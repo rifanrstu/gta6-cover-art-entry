@@ -11,6 +11,8 @@
 // Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 
+// Vice Cover Studio hand-in: copies the finished cover maker and its screenshots
+// out, then writes the dossier the judge reads. The app itself lives in app/.
 import { cpSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -18,6 +20,11 @@ import { buildDossier } from './vendor/makefun-app.ts';
 
 const here = fileURLToPath(new URL('.', import.meta.url));
 const out = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+
+// Fail loudly rather than hand in a hollow entry: the app and at least three
+// screenshots must be beside this file before anything is copied out.
+if (!existsSync(join(here, 'app', 'index.html'))) throw new Error('app/index.html is missing');
+if (!existsSync(join(here, 'screenshots'))) throw new Error('screenshots/ is missing');
 
 mkdirSync(out, { recursive: true });
 cpSync(join(here, 'app'), join(out, 'app'), { recursive: true });
